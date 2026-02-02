@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classification Result | CNN Image Classifier</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-animation"></div>
+
+    <main class="container">
+        <header class="header">
+            <a href="{{ url_for('index') }}" class="back-link">← Back to Home</a>
+            <div class="logo">
+                <span class="logo-icon">🧠</span>
+                <h1>Classification Result</h1>
+            </div>
+        </header>
+
+        <section class="result-section">
+            <div class="result-grid">
+                <!-- Image Preview Card -->
+                <div class="card glass-card image-card">
+                    <h3>Uploaded Image</h3>
+                    <div class="result-image-container">
+                        <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded image"
+                            class="result-image">
+                    </div>
+                </div>
+
+                <!-- Prediction Card -->
+                <div class="card glass-card prediction-card">
+                    <h3>Prediction</h3>
+
+                    <div class="main-prediction">
+                        <div class="prediction-icon">
+                            {% if predicted_class == 'airplane' %}✈️
+                            {% elif predicted_class == 'automobile' %}🚗
+                            {% elif predicted_class == 'bird' %}🐦
+                            {% elif predicted_class == 'cat' %}🐱
+                            {% elif predicted_class == 'deer' %}🦌
+                            {% elif predicted_class == 'dog' %}🐕
+                            {% elif predicted_class == 'frog' %}🐸
+                            {% elif predicted_class == 'horse' %}🐴
+                            {% elif predicted_class == 'ship' %}🚢
+                            {% elif predicted_class == 'truck' %}🚚
+                            {% else %}🔮
+                            {% endif %}
+                        </div>
+                        <div class="prediction-details">
+                            <span class="prediction-label">Detected:</span>
+                            <span class="prediction-class">{{ predicted_class|capitalize }}</span>
+                        </div>
+                    </div>
+
+                    <div class="confidence-meter">
+                        <div class="confidence-header">
+                            <span>Confidence</span>
+                            <span class="confidence-value">{{ "%.1f"|format(confidence) }}%</span>
+                        </div>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: {{ confidence }}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="top-predictions">
+                        <h4>Top 3 Predictions</h4>
+                        {% for pred in top_predictions %}
+                        <div class="prediction-item">
+                            <span class="prediction-item-class">
+                                {% if pred.class == 'airplane' %}✈️
+                                {% elif pred.class == 'automobile' %}🚗
+                                {% elif pred.class == 'bird' %}🐦
+                                {% elif pred.class == 'cat' %}🐱
+                                {% elif pred.class == 'deer' %}🦌
+                                {% elif pred.class == 'dog' %}🐕
+                                {% elif pred.class == 'frog' %}🐸
+                                {% elif pred.class == 'horse' %}🐴
+                                {% elif pred.class == 'ship' %}🚢
+                                {% elif pred.class == 'truck' %}🚚
+                                {% endif %}
+                                {{ pred.class|capitalize }}
+                            </span>
+                            <div class="prediction-item-bar">
+                                <div class="prediction-item-fill" style="width: {{ pred.confidence }}%"></div>
+                            </div>
+                            <span class="prediction-item-value">{{ "%.1f"|format(pred.confidence) }}%</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{{ url_for('index') }}" class="btn btn-primary">
+                    <span class="btn-icon">📸</span>
+                    Classify Another Image
+                </a>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>Powered by TensorFlow & Flask | CNN Model trained on CIFAR-10</p>
+        </footer>
+    </main>
+
+    <style>
+        .confidence-fill,
+        .prediction-item-fill {
+            animation: fillAnimation 1s ease-out forwards;
+        }
+
+        @keyframes fillAnimation {
+            from {
+                width: 0;
+            }
+        }
+    </style>
+</body>
+
+</html>

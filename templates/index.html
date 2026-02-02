@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered image classification using Convolutional Neural Networks">
+    <title>CNN Image Classifier | AI-Powered Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <main class="container">
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🧠</span>
+                <h1>CNN Image Classifier</h1>
+            </div>
+            <p class="tagline">AI-Powered Image Recognition using Deep Learning</p>
+        </header>
+
+        <section class="upload-section">
+            <div class="card glass-card">
+                <h2>Upload an Image</h2>
+                <p class="card-description">
+                    Upload any image and our CNN model will classify it into one of 10 categories
+                </p>
+
+                {% if error %}
+                <div class="alert alert-error">
+                    <span class="alert-icon">⚠️</span>
+                    {{ error }}
+                </div>
+                {% endif %}
+
+                <form action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data" id="upload-form">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-icon">📁</div>
+                        <p class="upload-text">Drag & drop your image here</p>
+                        <p class="upload-subtext">or click to browse</p>
+                        <input type="file" name="file" id="file-input" accept="image/*" required>
+                    </div>
+
+                    <div class="preview-container" id="preview-container" style="display: none;">
+                        <img id="image-preview" src="" alt="Preview">
+                        <button type="button" class="btn btn-remove" id="remove-btn">✕ Remove</button>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="submit-btn" disabled>
+                        <span class="btn-icon">🔍</span>
+                        Classify Image
+                    </button>
+                </form>
+
+                <div class="supported-formats">
+                    <span>Supported formats:</span>
+                    <span class="format-badge">JPG</span>
+                    <span class="format-badge">PNG</span>
+                    <span class="format-badge">GIF</span>
+                    <span class="format-badge">WEBP</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="categories-section">
+            <h3>Recognizable Categories</h3>
+            <div class="categories-grid">
+                {% for class in classes %}
+                <div class="category-chip">
+                    <span class="category-icon">
+                        {% if class == 'airplane' %}✈️
+                        {% elif class == 'automobile' %}🚗
+                        {% elif class == 'bird' %}🐦
+                        {% elif class == 'cat' %}🐱
+                        {% elif class == 'deer' %}🦌
+                        {% elif class == 'dog' %}🐕
+                        {% elif class == 'frog' %}🐸
+                        {% elif class == 'horse' %}🐴
+                        {% elif class == 'ship' %}🚢
+                        {% elif class == 'truck' %}🚚
+                        {% endif %}
+                    </span>
+                    {{ class|capitalize }}
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <footer class="footer">
+            <p>Powered by TensorFlow & Flask | CNN Model trained on CIFAR-10</p>
+        </footer>
+    </main>
+
+    <script>
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const previewContainer = document.getElementById('preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const submitBtn = document.getElementById('submit-btn');
+        const removeBtn = document.getElementById('remove-btn');
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect(files[0]);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // Handle file selection
+        function handleFileSelect(file) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    uploadArea.style.display = 'none';
+                    previewContainer.style.display = 'block';
+                    submitBtn.disabled = false;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Remove image
+        removeBtn.addEventListener('click', () => {
+            fileInput.value = '';
+            imagePreview.src = '';
+            uploadArea.style.display = 'flex';
+            previewContainer.style.display = 'none';
+            submitBtn.disabled = true;
+        });
+
+        // Form submit animation
+        document.getElementById('upload-form').addEventListener('submit', () => {
+            submitBtn.innerHTML = '<span class="loading-spinner"></span> Classifying...';
+            submitBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>
